@@ -197,7 +197,7 @@ export const LoadingView = ({
     );
 };
 
-export const Errorview = ({
+export const ErrorView = ({
     message,
 }: StateViewProps) => {
     return(
