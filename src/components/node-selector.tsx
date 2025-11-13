@@ -25,12 +25,20 @@ export type NodeTypeOption = {
     icon: React.ComponentType<{ className?: string }> | string;
 };
 
-const triggerNodes: NodeTypeOption[] = [{
+const triggerNodes: NodeTypeOption[] = [
+    {
     type: NodeType.MANUAL_TRIGGER,
     label: "Trigger manually",
     description: "Runs the flow on clicking a button. Good for getting started quickly.",
     icon: MousePointerIcon,
-},];
+    },
+    {
+    type: NodeType.GOOGLE_FORM_TRIGGER,
+    label: "Google Form",
+    description: "Runs the flow when a Google Form is submitted",
+    icon: "/logos/googleform.svg",
+    },
+];
 
 const executionNodes: NodeTypeOption[] = [{
     type: NodeType.HTTP_REQUEST,
