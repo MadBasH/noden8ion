@@ -39,27 +39,22 @@ const formSchema = z.object({
         .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, {
             message: "Variable name must start with a letter or underscore and container only letters, members, and underscores",
         }),
-        endpoint: z.string()
-            .min(1, {message: "Please enter a valid URL"}),
-    method: z.enum(["GET", "POST", "PUT", "PATCH", "DELETE"]),
-    body: z
-        .string()
-        .optional()
-        // .refine()
+    systemPrompt: z.string().optional(),
+    userPrompt: z.string().min(1, "User prompt is required")
 });
 
 
 
-export type HttpRequestFormValues = z.infer<typeof formSchema>;
+export type GeminiFormValues = z.infer<typeof formSchema>;
 
 interface Props {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onSubmit: (values: z.infer<typeof formSchema>) => void;
-    defaultValues?: Partial<HttpRequestFormValues>;
+    defaultValues?: Partial<GeminiFormValues>;
 };
 
-export const HttpRequestDialog = ({
+export const GeminiDialog = ({
     open,
     onOpenChange,
     onSubmit,
@@ -70,9 +65,8 @@ export const HttpRequestDialog = ({
         resolver: zodResolver(formSchema),
         defaultValues: {
             variableName: defaultValues.variableName || "",
-            endpoint: defaultValues.endpoint || "",
-            method: defaultValues.method || "GET",
-            body: defaultValues.body || "",
+            systemPrompt: defaultValues.systemPrompt || "",
+            userPrompt: defaultValues.userPrompt || "",
         },
     });
 
@@ -81,16 +75,13 @@ export const HttpRequestDialog = ({
         if (open) {
             form.reset({
                 variableName: defaultValues.variableName || "",
-                endpoint: defaultValues.endpoint || "",
-                method: defaultValues.method || "GET",
-                body: defaultValues.body || "",
+                systemPrompt: defaultValues.systemPrompt || "",
+                userPrompt: defaultValues.userPrompt || "",
             });
         }
     }, [open, defaultValues, form]);
 
-    const watchVariableName = form.watch("variableName") || "myApiCall";
-    const watchMethod = form.watch("method");
-    const showBodyField = ["POST", "PUT", "PATCH"].includes(watchMethod);
+    const watchVariableName = form.watch("variableName") || "myGemini";
 
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
         onSubmit(values);
@@ -102,10 +93,10 @@ export const HttpRequestDialog = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        HTTP Request
+                        Gemini Configuration
                     </DialogTitle>
                     <DialogDescription>
-                        Configure settings for the HTTP Request node.
+                        Configure the AI model and prompts for this node.
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -123,97 +114,62 @@ export const HttpRequestDialog = ({
                                     </FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="myApiCall"
+                                            placeholder="myGemini"
                                             {...field}
                                         />
                                     </FormControl>
                                     <FormDescription>
                                         Use this name to reference the result in other nodes: {" "}
-                                        {`{{${watchVariableName}.httpResponse.data}}`}
+                                        {`{{${watchVariableName}.text}}`}
                                     </FormDescription>
                                     <FormMessage/>
                                 </FormItem>
                             )}
                         />
-
-                        <FormField
-                            control={form.control}
-                            name="method"
-                            render={({field}) => (
+                            <FormField
+                                control={form.control}
+                                name="systemPrompt"
+                                render={({field}) => (
                                 <FormItem>
                                     <FormLabel>
-                                        Method
-                                    </FormLabel>
-                                    <Select
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select a method"/>
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="GET">GET</SelectItem>
-                                            <SelectItem value="POST">POST</SelectItem>
-                                            <SelectItem value="PUT">PUT</SelectItem>
-                                            <SelectItem value="PATCH">PATCH</SelectItem>
-                                            <SelectItem value="DELETE">DELETE</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormDescription>
-                                        The HTTP method to use for this request.
-                                    </FormDescription>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="endpoint"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Endpoint URL
+                                        System Prompt (Optional)
                                     </FormLabel>
                                     <FormControl>
-                                        <Input
-                                            placeholder="https://api.example.com/users/{{httpResponse.data.id}}"
+                                        <Textarea
+                                            placeholder="You are a helpful assistant."
+                                            className="min-h-[120px] font-mono text-sm"
                                             {...field}
                                         />
                                     </FormControl>
                                     <FormDescription>
-                                        Static URL or use {"{{variables}}"} for simple values or {"{{json variable}}"} to stringfy objects
-                                    </FormDescription>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-                        {showBodyField && (
-                            <FormField
-                                control={form.control}
-                                name="body"
-                                render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Request Body
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            placeholder={
-                                                '{\n "userId": "{{httpResponse.data.id}}",\n "name": "{{httpResponse.data.name}}",\n "items": "{{httpResponse.data.items}}"\n}'
-                                            }
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        JSON with template variables. Use {"{{variables}}"} for simple values or {"{{json variable}}"} to stringfy objets
+                                        Sets the behavior of the assistant. Use {"{{variables}}"} for simple values or {"{{json variable}}"} to stringify objects   
                                     </FormDescription>
                                     <FormMessage/>
                                 </FormItem>
                             )}
                             />
-                        )}
+                            <FormField
+                                control={form.control}
+                                name="userPrompt"
+                                render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        User Prompt
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            placeholder="Summarize this text: {{json httpResponse.data}}"
+                                            className="min-h-[120px] font-mono text-sm"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>
+                                        The prompt to send to AI. Use {"{{variables}}"} for simple values or {"{{json variable}}"} to stringify objects   
+                                    </FormDescription>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                            />
                         <DialogFooter className="mt-4">
                             <Button type="submit">
                                 Save

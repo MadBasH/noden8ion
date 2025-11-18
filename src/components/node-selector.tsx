@@ -46,12 +46,21 @@ const triggerNodes: NodeTypeOption[] = [
     },
 ];
 
-const executionNodes: NodeTypeOption[] = [{
+const executionNodes: NodeTypeOption[] = [
+    {
     type: NodeType.HTTP_REQUEST,
     label: "HTTP Request",
     description: "Makes an HTTP request.",
     icon: GlobeIcon,
-},];
+    },
+    {
+    type: NodeType.GEMINI,
+    label: "Gemini",
+    description: "Uses Google Gemini to generate text",
+    icon: "/logos/gemini.svg",
+    },
+];
+
 
 interface NodeSelectorProps {
     open: boolean;
