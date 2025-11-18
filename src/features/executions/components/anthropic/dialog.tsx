@@ -31,9 +31,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { CredentialType } from "@/generated/prisma";
-import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
 import Image from "next/image";
+import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
+import { CredentialType } from "@/generated/prisma";
 
 const formSchema = z.object({
     variableName: z
@@ -44,37 +44,36 @@ const formSchema = z.object({
         }),
     credentialId: z.string().min(1, "Credential is required"),
     systemPrompt: z.string().optional(),
-    userPrompt: z.string().min(1, "User prompt is required"),
+    userPrompt: z.string().min(1, "User prompt is required")
 });
 
 
 
-export type GeminiFormValues = z.infer<typeof formSchema>;
+export type AnthropicFormValues = z.infer<typeof formSchema>;
 
 interface Props {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onSubmit: (values: z.infer<typeof formSchema>) => void;
-    defaultValues?: Partial<GeminiFormValues>;
+    defaultValues?: Partial<AnthropicFormValues>;
 };
 
-export const GeminiDialog = ({
+export const AnthropicDialog = ({
     open,
     onOpenChange,
     onSubmit,
     defaultValues = {},
 }: Props) => {
-
     const {
-        data: credentials, 
-        isLoading: isloadingCredentials,
-    } = useCredentialsByType(CredentialType.GEMINI);
+            data: credentials, 
+            isLoading: isloadingCredentials,
+        } = useCredentialsByType(CredentialType.ANTHROPIC);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            credentialId: defaultValues.credentialId || "",
             variableName: defaultValues.variableName || "",
+            credentialId: defaultValues.credentialId || "",
             systemPrompt: defaultValues.systemPrompt || "",
             userPrompt: defaultValues.userPrompt || "",
         },
@@ -84,15 +83,15 @@ export const GeminiDialog = ({
     useEffect(() => {
         if (open) {
             form.reset({
-                credentialId: defaultValues.credentialId || "",
                 variableName: defaultValues.variableName || "",
+                credentialId: defaultValues.credentialId || "",
                 systemPrompt: defaultValues.systemPrompt || "",
                 userPrompt: defaultValues.userPrompt || "",
             });
         }
     }, [open, defaultValues, form]);
 
-    const watchVariableName = form.watch("variableName") || "myGemini";
+    const watchVariableName = form.watch("variableName") || "myAnthropic";
 
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
         onSubmit(values);
@@ -104,7 +103,7 @@ export const GeminiDialog = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        Gemini Configuration
+                        Anthropic Configuration
                     </DialogTitle>
                     <DialogDescription>
                         Configure the AI model and prompts for this node.
@@ -125,7 +124,7 @@ export const GeminiDialog = ({
                                     </FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="myGemini"
+                                            placeholder="myAnthropic"
                                             {...field}
                                         />
                                     </FormControl>
@@ -143,7 +142,7 @@ export const GeminiDialog = ({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
-                                            Gemini Credential
+                                            Anthropic Credential
                                         </FormLabel>
                                         <Select
                                             onValueChange={field.onChange}
@@ -165,8 +164,8 @@ export const GeminiDialog = ({
                                                     >
                                                         <div className="flex items-center gap-2" >
                                                             <Image
-                                                                src="/logos/gemini.svg"
-                                                                alt="Gemini"
+                                                                src="/logos/anthropic.svg"
+                                                                alt="Anthropic"
                                                                 width={16}
                                                                 height={16}
                                                             />
@@ -179,9 +178,7 @@ export const GeminiDialog = ({
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />                        
-                        
-
+                            />  
                             <FormField
                                 control={form.control}
                                 name="systemPrompt"
