@@ -118,7 +118,8 @@ export const anthropicExecutor: NodeExecutor<AnthropicData> = async({
         return {
             ...context,
             [data.variableName]: {
-                aiResponse: text.trim(),
+                aiResponse: text,
+                text: text,
             },
         }
     } catch (error) {
