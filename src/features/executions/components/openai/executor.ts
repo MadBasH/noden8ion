@@ -124,7 +124,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async({
         return {
             ...context,
             [data.variableName]: {
-                aiResponse: text,
+                aiResponse: text.trim(),
             },
         }
     } catch (error) {
