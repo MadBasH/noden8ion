@@ -131,7 +131,7 @@ export const OpenAIDialog = ({
                                     </FormControl>
                                     <FormDescription>
                                         Use this name to reference the result in other nodes: {" "}
-                                        {`{{${watchVariableName}.text}}`}
+                                        {`{{${watchVariableName}.aiResponse}}`}
                                     </FormDescription>
                                     <FormMessage/>
                                 </FormItem>
