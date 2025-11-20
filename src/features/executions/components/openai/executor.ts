@@ -112,7 +112,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async({
 
         const text = 
             steps[0].content[0].type === "text"
-            ? steps[0].content[0].text
+            ? steps[0].content[0].text.trim()
             : "";
         await publish(
             openAIChannel().status({
@@ -125,7 +125,6 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async({
             ...context,
             [data.variableName]: {
                 aiResponse: text,
-                text: text,
             },
         }
     } catch (error) {

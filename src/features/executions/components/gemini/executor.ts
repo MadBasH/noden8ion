@@ -106,7 +106,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async({
 
         const text = 
             steps[0].content[0].type === "text"
-            ? steps[0].content[0].text
+            ? steps[0].content[0].text.trim()
             : "";
         await publish(
             geminiChannel().status({
@@ -119,7 +119,6 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async({
             ...context,
             [data.variableName]: {
                 aiResponse: text,
-                text: text,
             },
         }
     } catch (error) {
